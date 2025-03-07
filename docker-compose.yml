@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  mongo:
+    image: mongo:6.0
+    container_name: swiftparser-db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    restart: always
+
+  app:
+    build: .
+    container_name: swiftparser-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongo
+    environment:
+      - DATABASE_URL=mongodb://mongo:27017/swiftcodes
+    volumes:
+      - ./SWIFT_CODES.csv:/app/data/SWIFT_CODES.csv
+    restart: always
+volumes:
+  mongo_data:
