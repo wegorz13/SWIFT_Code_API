@@ -1,11 +1,9 @@
 import fs from "fs";
 import path from "path";
 import csv from "csv-parser";
-import { SwiftData } from "./models/SwiftData";
+import { SwiftData } from "./models/swift-data";
 
 export async function importSwiftData(filePath: string) {
-  console.log("📂 Importing data from:", filePath);
-
   try {
     const ext = path.extname(filePath).toLowerCase();
     if (ext !== ".csv") throw new Error("Only .csv files are supported");
@@ -29,7 +27,7 @@ export async function importSwiftData(filePath: string) {
             !address ||
             !countryName
           ) {
-            console.warn("⚠️ Skipping row due to missing fields:", row);
+            console.warn("Skipping row due to missing fields", row);
             return;
           }
 
@@ -43,29 +41,27 @@ export async function importSwiftData(filePath: string) {
           });
         })
         .on("end", async () => {
-          console.log(`✅ Processed ${data.length} valid records`);
-
           if (data.length > 0) {
             try {
               const result = await SwiftData.insertMany(data);
-              console.log(`✅ Successfully inserted ${result.length} records`);
+              console.log(`Successfully inserted ${result.length} records`);
               resolve(result);
-            } catch (dbError) {
-              console.error("❌ Database Insert Error:", dbError);
-              reject(dbError);
+            } catch (error) {
+              console.error("Database insert error", error);
+              reject(error);
             }
           } else {
-            console.warn("⚠️ No valid records to insert.");
+            console.warn("No valid records to insert");
             resolve([]);
           }
         })
         .on("error", (error) => {
-          console.error("❌ CSV Parsing Error:", error);
+          console.error("CSV parsing error", error);
           reject(error);
         });
     });
   } catch (error) {
-    console.error("❌ Import Error:", error);
+    console.error("Import error", error);
     throw error;
   }
 }

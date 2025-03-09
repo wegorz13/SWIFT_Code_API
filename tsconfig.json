@@ -110,5 +110,6 @@
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
     "skipLibCheck": true /* Skip type checking all .d.ts files. */
   },
-  "include": ["routes", "./*.ts"]
+  "include": ["routes", "./*.ts"],
+  "exclude": ["./coverage", "./dist", "__tests__", "jest.config.js"]
 }
