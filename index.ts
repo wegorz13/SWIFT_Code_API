@@ -19,17 +19,17 @@ if (process.env.NODE_ENV !== "test") {
   const db = mongoose.connection;
   db.on("error", (error) => console.error(error));
   db.once("open", () => console.log("Connected to MongoDB"));
+
+  (async () => {
+    try {
+      console.log("Importing SWIFT codes...");
+      await importSwiftData("/app/data/SWIFT_CODES.csv");
+      console.log("Data import successful");
+    } catch (error) {
+      console.error("Failed to import initial data", error);
+    }
+  })();
 }
-// uncomment if you want to load data from csv file, run npx tsc before building
-// (async () => {
-//   try {
-//     console.log("Importing SWIFT codes...");
-//     await importSwiftData("/app/data/SWIFT_CODES.csv"); // Adjust the path to match your Docker setup
-//     console.log("Data import successful!");
-//   } catch (error) {
-//     console.error("Failed to import initial data:", error);
-//   }
-// })();
 
 app.use(express.json());
 

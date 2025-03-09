@@ -24,12 +24,9 @@ router.get("/country/:iso2_code", async (req, res) => {
     const swiftCodes = await SwiftData.find(
       { countryISO2: countryISO2 },
       {
-        address: 1,
-        name: 1,
-        countryISO2: 1,
-        swiftCode: 1,
-        isHeadquarter: 1,
         _id: 0,
+        __v: 0,
+        countryISO2: 0,
       }
     );
     res.json({
@@ -45,7 +42,10 @@ router.get("/country/:iso2_code", async (req, res) => {
 router.get("/:swift_code", async (req, res) => {
   const swiftCode = req.params.swift_code;
   try {
-    const data = await SwiftData.findOne({ swiftCode: swiftCode });
+    const data = await SwiftData.findOne(
+      { swiftCode: swiftCode },
+      { _id: 0, __v: 0 }
+    );
     if (!data?.swiftCode) {
       res.status(404).json({
         message: "Swift code doesn't exist",
@@ -53,12 +53,12 @@ router.get("/:swift_code", async (req, res) => {
       return;
     }
     if (!data.isHeadquarter) {
-      res.json(data); //ma byc inna odpowiedz
+      res.json(data);
     } else {
-      const branchPrefix = swiftCode.slice(0, 8); // First 8 characters
+      const branchPrefix = swiftCode.slice(0, 8);
       const branches = await SwiftData.find(
         {
-          swiftCode: { $ne: swiftCode, $regex: `^${branchPrefix}` }, // Matches same first 8 letters, excludes itself
+          swiftCode: { $ne: swiftCode, $regex: `^${branchPrefix}` },
         },
         { _id: 0, __v: 0 }
       );

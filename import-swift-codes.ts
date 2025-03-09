@@ -43,9 +43,20 @@ export async function importSwiftData(filePath: string) {
         .on("end", async () => {
           if (data.length > 0) {
             try {
-              const result = await SwiftData.insertMany(data);
-              console.log(`Successfully inserted ${result.length} records`);
-              resolve(result);
+              let insertedCount = 0;
+
+              for (const entry of data) {
+                const existingRecord = await SwiftData.findOne({
+                  swiftCode: entry.swiftCode,
+                });
+
+                if (!existingRecord) {
+                  await SwiftData.create(entry);
+                  insertedCount++;
+                }
+              }
+              console.log(`Successfully inserted ${insertedCount} records`);
+              resolve(insertedCount);
             } catch (error) {
               console.error("Database insert error", error);
               reject(error);
